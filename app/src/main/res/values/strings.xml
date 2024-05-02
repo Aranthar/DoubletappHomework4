@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Doubletapp Homework 4</string>
+    <string name="add">Добавить</string>
+    <string name="priority">Укажите приоритет</string>
+    <string name="habit_type">Выберите тип привычки</string>
+    <string name="habit_list">Список привычек</string>
+    <string name="about_us">Приложение написано студентом 3 курса ИРИТ-РТФ, Данилой Коломийцем в 2024 году.</string>
+</resources>
