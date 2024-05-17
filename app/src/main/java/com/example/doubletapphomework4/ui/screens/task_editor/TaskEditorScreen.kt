@@ -22,7 +22,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -32,8 +31,6 @@ import com.example.doubletapphomework4.ui.common.enums.HabitPriority
 import com.example.doubletapphomework4.ui.common.enums.HabitType
 import com.example.doubletapphomework4.ui.common.models.HabitData
 import com.example.doubletapphomework4.ui.screens.task_editor.models.TaskEditorEvent
-import com.example.doubletapphomework4.ui.screens.task_editor.models.TaskEditorViewState
-import com.example.doubletapphomework4.ui.screens.tasks_list.models.TasksListEvent
 
 class TaskEditorScreen(
     private val viewModel: TaskEditorViewModel,
@@ -218,7 +215,6 @@ class TaskEditorScreen(
                 )
                 Text(text = HabitType.BAD.toString())
             }
-
         }
     }
 }

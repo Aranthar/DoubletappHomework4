@@ -9,4 +9,8 @@ data class TasksListViewState(
         HabitType.BAD to mutableListOf(),
     ),
     val toType: HabitType = HabitType.GOOD,
+    val showBottomSheet: Boolean = false,
+    val searchText: String = "",
+    val selectedFilter: Filters = Filters.NONE,
+    val filteredList: List<HabitData> = listOf(),
 )

@@ -5,4 +5,5 @@
     <string name="habit_type">Выберите тип привычки</string>
     <string name="habit_list">Список привычек</string>
     <string name="about_us">Приложение написано студентом 3 курса ИРИТ-РТФ, Данилой Коломийцем в 2024 году.</string>
+    <string name="search_hint">Поиск</string>
 </resources>
