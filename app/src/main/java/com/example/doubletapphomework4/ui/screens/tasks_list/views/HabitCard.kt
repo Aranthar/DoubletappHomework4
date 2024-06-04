@@ -21,11 +21,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.example.doubletapphomework4.ui.common.models.HabitData
+import com.example.doubletapphomework4.ui.common.models.HabitUI
 import com.example.doubletapphomework4.ui.common.enums.HabitType
 
 @Composable
-fun HabitCard(habitData: HabitData, onHabitClick: (HabitData) -> Unit) {
+fun HabitCard(habitData: HabitUI, onHabitClick: (HabitUI) -> Unit) {
     Card(modifier = Modifier
         .fillMaxWidth()
         .clickable { onHabitClick(habitData) }

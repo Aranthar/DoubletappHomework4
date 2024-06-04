@@ -1,7 +1,9 @@
 package com.example.doubletapphomework4.ui.screens.tasks_list.models
 
-import com.example.doubletapphomework4.ui.common.models.HabitData
+import com.example.doubletapphomework4.ui.common.models.HabitUI
 
 sealed class TasksListEvent {
-    data class UploadHabit(val habitData: HabitData): TasksListEvent()
+    data class UploadHabit(val habitData: HabitUI?): TasksListEvent()
+    data class IsSheetOpen(val showBottomSheen: Boolean): TasksListEvent()
+    data class SearchCard(val searchText: String, val filter: Filters): TasksListEvent()
 }

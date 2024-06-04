@@ -2,13 +2,10 @@ package com.example.doubletapphomework4.ui.screens.tasks_list.views
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ModalNavigationDrawer
-import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDrawerState
@@ -20,7 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.doubletapphomework4.ui.common.models.HabitData
+import com.example.doubletapphomework4.ui.common.models.HabitUI
 import com.example.doubletapphomework4.ui.screens.tasks_list.TasksListScreen
 import com.example.doubletapphomework4.ui.screens.tasks_list.TasksListViewModel
 import kotlinx.coroutines.launch
@@ -29,8 +26,8 @@ import kotlinx.coroutines.launch
 fun Drawer(
     viewModel: TasksListViewModel,
     onCreateCard: () -> Unit,
-    habit: HabitData?,
-    onHabitClick: (HabitData) -> Unit,
+    habit: HabitUI?,
+    onHabitClick: (HabitUI) -> Unit,
     onDrawerClick: (item: String) -> Unit,
 ) {
     val items = listOf("Главный экран", "О нас")
