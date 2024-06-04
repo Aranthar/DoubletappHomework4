@@ -6,7 +6,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.doubletapphomework4.ui.common.models.HabitData
+import com.example.doubletapphomework4.ui.common.models.HabitUI
 import com.example.doubletapphomework4.ui.screens.about_us.AboutUsScreen
 import com.example.doubletapphomework4.ui.screens.task_editor.TaskEditorScreen
 import com.example.doubletapphomework4.ui.screens.task_editor.TaskEditorViewModel
@@ -15,7 +15,7 @@ import com.example.doubletapphomework4.ui.screens.tasks_list.views.Drawer
 
 class Navigation {
     private var navController: NavHostController? = null
-    private var habit: HabitData? = null
+    private var habit: HabitUI? = null
     private var isEdit = false
 
     @Composable
@@ -40,7 +40,7 @@ class Navigation {
     @Composable
     private fun CreateTasksListScreen(
         taskListViewModel: TasksListViewModel,
-        habit: HabitData?,
+        habit: HabitUI?,
     ) {
         Drawer(
             viewModel = taskListViewModel,
@@ -67,7 +67,7 @@ class Navigation {
     @Composable
     private fun CreateTaskEditorScreen(
         taskEditorViewModel: TaskEditorViewModel,
-        habit: HabitData?,
+        habit: HabitUI?,
     ) {
         TaskEditorScreen(
             viewModel = taskEditorViewModel,

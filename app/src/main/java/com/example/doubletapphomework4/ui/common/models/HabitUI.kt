@@ -1,14 +1,10 @@
 package com.example.doubletapphomework4.ui.common.models
 
-import androidx.room.Entity
-import androidx.room.PrimaryKey
 import com.example.doubletapphomework4.ui.common.enums.HabitPriority
 import com.example.doubletapphomework4.ui.common.enums.HabitType
 import kotlin.random.Random
 
-@Entity(tableName = "Habit")
-data class HabitData(
-    @PrimaryKey(autoGenerate = true)
+data class HabitUI(
     val id: Int = Random.nextInt(),
     val title: String = "",
     val description: String = "",

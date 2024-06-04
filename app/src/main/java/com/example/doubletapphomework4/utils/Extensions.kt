@@ -16,9 +16,9 @@ import androidx.compose.ui.composed
 import androidx.compose.ui.focus.onFocusEvent
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalView
-import com.example.doubletapphomework4.ui.common.models.HabitData
+import com.example.doubletapphomework4.ui.common.models.HabitUI
 
-fun List<HabitData>.indexOfById(habitData: HabitData): Int {
+fun List<HabitUI>.indexOfById(habitData: HabitUI): Int {
     this.forEachIndexed { index, habit ->
         if (habit.id == habitData.id) {
             return index

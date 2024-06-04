@@ -1,33 +1,51 @@
 package com.example.doubletapphomework4.ui.screens.tasks_list
 
+import androidx.lifecycle.viewModelScope
 import com.example.doubletapphomework4.ui.common.enums.HabitPriority
 import com.example.doubletapphomework4.ui.common.enums.HabitType
 import com.example.doubletapphomework4.ui.common.models.BaseViewModel
-import com.example.doubletapphomework4.ui.common.models.HabitData
+import com.example.doubletapphomework4.ui.common.models.HabitUI
+import com.example.doubletapphomework4.ui.common.repository.HabitRepositoryImpl
 import com.example.doubletapphomework4.ui.screens.tasks_list.models.Filters
 import com.example.doubletapphomework4.ui.screens.tasks_list.models.TasksListEvent
 import com.example.doubletapphomework4.ui.screens.tasks_list.models.TasksListViewState
 import com.example.doubletapphomework4.utils.indexOfById
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class TasksListViewModel @Inject constructor() :
+class TasksListViewModel @Inject constructor(private val habitRepositoryImpl: HabitRepositoryImpl) :
     BaseViewModel<TasksListViewState, TasksListEvent>(initialState = TasksListViewState()) {
-    private val habitsByType: Map<HabitType, MutableList<HabitData>> = mapOf(
+    private var habitsByType: Map<HabitType, MutableList<HabitUI>> = mapOf(
         HabitType.GOOD to mutableListOf(),
         HabitType.BAD to mutableListOf(),
     )
     private var showBottomSheet: Boolean = false
     private var searchText: String = ""
     private var currentFilter: Filters = Filters.NONE
-    private var filteredList: MutableList<HabitData> = mutableListOf()
+    private var filteredList: MutableList<HabitUI> = mutableListOf()
 
     override fun obtainEvent(viewEvent: TasksListEvent) {
         when (viewEvent) {
             is TasksListEvent.UploadHabit -> {
-                restoreHabits(viewEvent.habitData)
+                viewModelScope.launch {
+                    habitsByType[HabitType.GOOD]?.clear()
+                    habitsByType[HabitType.BAD]?.clear()
+
+                    habitRepositoryImpl.getAllHabits().forEach { habit ->
+                        if (habit.type == HabitType.GOOD) {
+                            habitsByType[HabitType.GOOD]?.add(habit)
+                        } else {
+                            habitsByType[HabitType.BAD]?.add(habit)
+                        }
+                    }
+
+                    restoreHabits(viewEvent.habitData)
+
+                    viewState.update { it.copy(habitsByType = habitsByType.toMap()) }
+                }
             }
 
             is TasksListEvent.IsSheetOpen -> {
@@ -77,7 +95,7 @@ class TasksListViewModel @Inject constructor() :
         searchByFilter(filter)
 
         if (text != "") {
-            val filteredText = mutableListOf<HabitData>()
+            val filteredText = mutableListOf<HabitUI>()
 
             filteredList.forEach { habitData ->
                 if (habitData.title.lowercase().contains(text.lowercase())) {
@@ -93,7 +111,7 @@ class TasksListViewModel @Inject constructor() :
         when (filter) {
             Filters.NONE -> filteredList
             Filters.PRIORITY -> {
-                val filterMap = mutableMapOf<HabitPriority, MutableList<HabitData>>(
+                val filterMap = mutableMapOf<HabitPriority, MutableList<HabitUI>>(
                     HabitPriority.HIGH to mutableListOf(),
                     HabitPriority.MEDIUM to mutableListOf(),
                     HabitPriority.LOW to mutableListOf()
@@ -114,7 +132,7 @@ class TasksListViewModel @Inject constructor() :
             }
 
             Filters.TYPE -> {
-                val filterMap = mutableMapOf<HabitType, MutableList<HabitData>>(
+                val filterMap = mutableMapOf<HabitType, MutableList<HabitUI>>(
                     HabitType.GOOD to mutableListOf(),
                     HabitType.BAD to mutableListOf()
                 )
@@ -134,7 +152,7 @@ class TasksListViewModel @Inject constructor() :
     }
 
 
-    private fun restoreHabits(newHabit: HabitData?) {
+    private fun restoreHabits(newHabit: HabitUI?) {
         if (newHabit == null || !habitsByType.containsKey(newHabit.type)) return
 
         val goodList = habitsByType[HabitType.GOOD]!!
@@ -156,7 +174,5 @@ class TasksListViewModel @Inject constructor() :
         } else {
             habitsByType[newHabit.type]?.add(newHabit)
         }
-
-        viewState.update { it.copy(habitsByType = habitsByType) }
     }
 }

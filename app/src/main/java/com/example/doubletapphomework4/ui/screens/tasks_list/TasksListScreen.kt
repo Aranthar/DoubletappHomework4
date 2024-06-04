@@ -48,7 +48,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.doubletapphomework4.R
 import com.example.doubletapphomework4.ui.common.enums.HabitType
-import com.example.doubletapphomework4.ui.common.models.HabitData
+import com.example.doubletapphomework4.ui.common.models.HabitUI
 import com.example.doubletapphomework4.ui.screens.tasks_list.models.Filters
 import com.example.doubletapphomework4.ui.screens.tasks_list.models.TasksListEvent
 import com.example.doubletapphomework4.ui.screens.tasks_list.views.HabitCard
@@ -57,9 +57,9 @@ import kotlinx.coroutines.launch
 
 class TasksListScreen(
     private val viewModel: TasksListViewModel,
-    private val habit: HabitData?,
+    private val habit: HabitUI?,
     private val onCreateCard: () -> Unit,
-    private val onHabitClick: (HabitData) -> Unit,
+    private val onHabitClick: (HabitUI) -> Unit,
 ) {
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
@@ -71,10 +71,8 @@ class TasksListScreen(
         val selectedTabIndex = remember { derivedStateOf { pagerState.currentPage } }
         val selectedFilter = remember { mutableStateOf(viewState.selectedFilter) }
 
-        if (habit != null) {
-            LaunchedEffect(key1 = Unit) {
-                habit.let { viewModel.obtainEvent(TasksListEvent.UploadHabit(it)) }
-            }
+        LaunchedEffect(key1 = Unit) {
+            habit.let { viewModel.obtainEvent(TasksListEvent.UploadHabit(it)) }
         }
 
         Scaffold(
@@ -155,8 +153,8 @@ class TasksListScreen(
 
     @Composable
     private fun HabitList(
-        habitsList: List<HabitData>,
-        onHabitClick: (HabitData) -> Unit,
+        habitsList: List<HabitUI>,
+        onHabitClick: (HabitUI) -> Unit,
     ) {
         LazyColumn(
             modifier = Modifier.padding(vertical = 10.dp, horizontal = 15.dp)
@@ -177,7 +175,7 @@ class TasksListScreen(
         searchText: String,
         selectedFilter: MutableState<Filters>,
         showBottomSheet: Boolean,
-        filteredList: List<HabitData>,
+        filteredList: List<HabitUI>,
     ) {
         val sheetState = rememberModalBottomSheetState()
 

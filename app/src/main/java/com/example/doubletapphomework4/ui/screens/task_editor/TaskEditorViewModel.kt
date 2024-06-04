@@ -1,18 +1,22 @@
 package com.example.doubletapphomework4.ui.screens.task_editor
 
+import androidx.lifecycle.viewModelScope
 import com.example.doubletapphomework4.ui.common.enums.HabitFieldType
 import com.example.doubletapphomework4.ui.common.models.BaseViewModel
-import com.example.doubletapphomework4.ui.common.models.HabitData
+import com.example.doubletapphomework4.ui.common.models.HabitUI
+import com.example.doubletapphomework4.ui.common.repository.HabitRepositoryImpl
 import com.example.doubletapphomework4.ui.screens.task_editor.models.TaskEditorEvent
 import com.example.doubletapphomework4.ui.screens.task_editor.models.TaskEditorViewState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class TaskEditorViewModel @Inject constructor() :
+class TaskEditorViewModel @Inject constructor(private val habitRepositoryImpl: HabitRepositoryImpl) :
     BaseViewModel<TaskEditorViewState, TaskEditorEvent>(initialState = TaskEditorViewState()) {
-    private var habitData: HabitData = HabitData()
+    private var habitData: HabitUI = HabitUI()
+    private var uploadHabit: Boolean = false
 
     override fun obtainEvent(viewEvent: TaskEditorEvent) {
         when (viewEvent) {
@@ -46,21 +50,29 @@ class TaskEditorViewModel @Inject constructor() :
             TaskEditorEvent.ClickBackBtn -> setHabitAndUpdateViewState()
 
             TaskEditorEvent.ClickBtnSave -> {
-                viewState.update { it.copy(habitData = habitData.copy()) }
+                viewModelScope.launch {
+                    viewState.update { it.copy(habitData = habitData.copy()) }
+
+                    if (uploadHabit) {
+                        habitRepositoryImpl.updateHabit(habitData)
+                    } else habitRepositoryImpl.insertHabit(habitData)
+
+                    uploadHabit = false
+                }
             }
 
             is TaskEditorEvent.UploadHabit -> {
                 setHabitAndUpdateViewState(viewEvent.habitData.copy())
+                uploadHabit = true
             }
 
             TaskEditorEvent.ClearViewState -> setHabitAndUpdateViewState()
         }
     }
 
-    private fun setHabitAndUpdateViewState(habitData: HabitData = HabitData()) {
+    private fun setHabitAndUpdateViewState(habitData: HabitUI = HabitUI()) {
         this.habitData = habitData
-        viewState.update {
-            it.copy(habitData = habitData)
-        }
+        viewState.update { it.copy(habitData = habitData) }
+        uploadHabit = false
     }
 }
