@@ -1,5 +1,7 @@
 package com.example.doubletapphomework4.ui.screens.tasks_list.views
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
@@ -22,6 +24,7 @@ import com.example.doubletapphomework4.ui.screens.tasks_list.TasksListScreen
 import com.example.doubletapphomework4.ui.screens.tasks_list.TasksListViewModel
 import kotlinx.coroutines.launch
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun Drawer(
     viewModel: TasksListViewModel,
