@@ -36,12 +36,19 @@ class TaskEditorViewModel @Inject constructor(private val habitRepositoryImpl: H
                 }
             }
 
+            is TaskEditorEvent.ChangePeriod -> {
+                habitData = habitData.copy(period = viewEvent.period)
+
+                viewState.update {
+                    it.copy(habitData = habitData)
+                }
+            }
+
             is TaskEditorEvent.ChangeFieldText -> {
                 habitData = when (viewEvent.type) {
                     HabitFieldType.TITLE -> habitData.copy(title = viewEvent.text)
                     HabitFieldType.DESCRIPTION -> habitData.copy(description = viewEvent.text)
                     HabitFieldType.REPEAT_COUNT -> habitData.copy(repeatCount = viewEvent.text)
-                    HabitFieldType.PERIOD -> habitData.copy(period = viewEvent.text)
                 }
 
                 viewState.update { it.copy(habitData = habitData) }

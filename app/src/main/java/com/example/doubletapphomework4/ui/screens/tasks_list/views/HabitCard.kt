@@ -13,43 +13,65 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.example.doubletapphomework4.ui.common.models.HabitUI
+import com.example.doubletapphomework4.R
 import com.example.doubletapphomework4.ui.common.enums.HabitType
+import com.example.doubletapphomework4.ui.common.models.HabitUI
 
 @Composable
-fun HabitCard(habitData: HabitUI, onHabitClick: (HabitUI) -> Unit) {
+fun HabitCard(
+    habitData: HabitUI,
+    onHabitClick: (HabitUI) -> Unit,
+    onHabitDone: () -> Unit,
+    onHabitDelete: () -> Unit,
+) {
     Card(modifier = Modifier
         .fillMaxWidth()
         .clickable { onHabitClick(habitData) }
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Row {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    ColoredCircle(
-                        color = if (habitData.type == HabitType.GOOD) {
-                            Color.Green
-                        } else Color.Red
-                    )
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Row {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        ColoredCircle(
+                            color = if (habitData.type == HabitType.GOOD) {
+                                Color.Green
+                            } else Color.Red
+                        )
 
-                    Spacer(modifier = Modifier.height(10.dp))
+                        Spacer(modifier = Modifier.height(10.dp))
 
-                    Text(text = habitData.priority.toString())
+                        Text(text = habitData.priority.toString())
+                    }
+
+                    Spacer(modifier = Modifier.width(16.dp))
+
+                    Column(horizontalAlignment = Alignment.Start) {
+                        Text(text = habitData.title)
+                        Spacer(modifier = Modifier.height(10.dp))
+                        Text(text = habitData.description)
+                    }
                 }
 
-                Spacer(modifier = Modifier.width(16.dp))
-
-                Column(horizontalAlignment = Alignment.Start) {
-                    Text(text = habitData.title)
-                    Spacer(modifier = Modifier.height(10.dp))
-                    Text(text = habitData.description)
+                IconButton(onClick = onHabitDelete) {
+                    Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete habit")
                 }
             }
 
@@ -75,6 +97,19 @@ fun HabitCard(habitData: HabitUI, onHabitClick: (HabitUI) -> Unit) {
                     text = "Периодичность: ${habitData.period}",
                     modifier = Modifier.weight(1f)
                 )
+            }
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            TextButton(
+                onClick = onHabitDone,
+                colors = ButtonDefaults.textButtonColors(
+                    containerColor = Color.Gray,
+                    contentColor = Color.White
+                ),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(text = stringResource(id = R.string.done))
             }
         }
     }

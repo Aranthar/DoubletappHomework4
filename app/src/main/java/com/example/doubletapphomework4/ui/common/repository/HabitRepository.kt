@@ -1,6 +1,7 @@
 package com.example.doubletapphomework4.ui.common.repository
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
@@ -14,6 +15,9 @@ interface HabitRepository {
 
     @Update
     suspend fun updateHabit(habitData: HabitData)
+
+    @Delete
+    suspend fun deleteHabit(habitData: HabitData)
 
     @Query("SELECT * FROM Habit")
     suspend fun getAllHabits(): List<HabitUI>

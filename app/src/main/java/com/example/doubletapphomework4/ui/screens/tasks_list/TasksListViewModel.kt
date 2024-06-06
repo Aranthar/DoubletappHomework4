@@ -1,6 +1,9 @@
 package com.example.doubletapphomework4.ui.screens.tasks_list
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.lifecycle.viewModelScope
+import com.example.doubletapphomework4.ui.common.enums.HabitPeriod
 import com.example.doubletapphomework4.ui.common.enums.HabitPriority
 import com.example.doubletapphomework4.ui.common.enums.HabitType
 import com.example.doubletapphomework4.ui.common.models.BaseViewModel
@@ -13,12 +16,16 @@ import com.example.doubletapphomework4.utils.indexOfById
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.time.DayOfWeek
+import java.time.LocalDate
+import java.time.temporal.ChronoUnit
+import java.time.temporal.TemporalAdjusters
 import javax.inject.Inject
 
 @HiltViewModel
 class TasksListViewModel @Inject constructor(private val habitRepositoryImpl: HabitRepositoryImpl) :
     BaseViewModel<TasksListViewState, TasksListEvent>(initialState = TasksListViewState()) {
-    private var habitsByType: Map<HabitType, MutableList<HabitUI>> = mapOf(
+    private val habitsByType: Map<HabitType, MutableList<HabitUI>> = mapOf(
         HabitType.GOOD to mutableListOf(),
         HabitType.BAD to mutableListOf(),
     )
@@ -26,7 +33,9 @@ class TasksListViewModel @Inject constructor(private val habitRepositoryImpl: Ha
     private var searchText: String = ""
     private var currentFilter: Filters = Filters.NONE
     private var filteredList: MutableList<HabitUI> = mutableListOf()
+    private var daysLeft: Long = 0
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun obtainEvent(viewEvent: TasksListEvent) {
         when (viewEvent) {
             is TasksListEvent.UploadHabit -> {
@@ -81,7 +90,57 @@ class TasksListViewModel @Inject constructor(private val habitRepositoryImpl: Ha
                     it.copy(filteredList = filteredList)
                 }
             }
+
+            is TasksListEvent.DeleteHabit -> {
+                habitsByType[viewEvent.habitData.type]?.remove(viewEvent.habitData)
+
+                viewState.update { it.copy(habitsByType = habitsByType.toMap()) }
+
+                viewModelScope.launch {
+                    habitRepositoryImpl.deleteHabit(viewEvent.habitData)
+                }
+            }
+
+            is TasksListEvent.DoneHabit -> {
+                viewModelScope.launch {
+                    val newHabit = habitDone(viewEvent.habitData)
+
+                    habitsByType[viewEvent.habitData.type]?.set(
+                        viewEvent.index,
+                        newHabit
+                    )
+                    habitRepositoryImpl.updateHabit(newHabit)
+
+                    viewState.update { it.copy(habitsByType = habitsByType.toMap()) }
+                }
+            }
         }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun habitDone(habit: HabitUI): HabitUI {
+        val endOfWeek = when (habit.period) {
+            HabitPeriod.WEEK -> {
+                LocalDate.now().with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY))
+            }
+
+            HabitPeriod.MONTH -> {
+                LocalDate.now().with(TemporalAdjusters.lastDayOfMonth())
+            }
+
+            HabitPeriod.YEAR -> {
+                LocalDate.now().with(TemporalAdjusters.lastDayOfYear())
+            }
+        }
+        val currentDaysLeft = ChronoUnit.DAYS.between(LocalDate.now(), endOfWeek)
+
+        if (daysLeft < currentDaysLeft) {
+            habit.currentRepeatCount = 0
+            daysLeft = currentDaysLeft
+        }
+        habit.currentRepeatCount++
+
+        return habit
     }
 
     private fun searchList(text: String, filter: Filters) {

@@ -1,6 +1,10 @@
 package com.example.doubletapphomework4.ui.screens.tasks_list
 
 import android.annotation.SuppressLint
+import android.content.Context
+import android.os.Build
+import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -43,6 +47,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -53,6 +58,7 @@ import com.example.doubletapphomework4.ui.screens.tasks_list.models.Filters
 import com.example.doubletapphomework4.ui.screens.tasks_list.models.TasksListEvent
 import com.example.doubletapphomework4.ui.screens.tasks_list.views.HabitCard
 import com.example.doubletapphomework4.ui.screens.tasks_list.views.SearchView
+import com.example.doubletapphomework4.utils.isNumeric
 import kotlinx.coroutines.launch
 
 class TasksListScreen(
@@ -61,14 +67,17 @@ class TasksListScreen(
     private val onCreateCard: () -> Unit,
     private val onHabitClick: (HabitUI) -> Unit,
 ) {
+    @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
     @Composable
     fun Create() {
         val viewState by viewModel.getViewState().collectAsStateWithLifecycle()
+
         val scope = rememberCoroutineScope()
         val pagerState = rememberPagerState(pageCount = { HabitType.entries.size })
         val selectedTabIndex = remember { derivedStateOf { pagerState.currentPage } }
+
         val selectedFilter = remember { mutableStateOf(viewState.selectedFilter) }
 
         LaunchedEffect(key1 = Unit) {
@@ -98,16 +107,13 @@ class TasksListScreen(
                     onClick = {
                         viewModel.obtainEvent(TasksListEvent.IsSheetOpen(true))
                     },
-                    onValueChange = {}
-                )
+                    onValueChange = {})
 
                 TabRow(
-                    selectedTabIndex = selectedTabIndex.value,
-                    modifier = Modifier.fillMaxWidth()
+                    selectedTabIndex = selectedTabIndex.value, modifier = Modifier.fillMaxWidth()
                 ) {
                     HabitType.entries.forEachIndexed { index, habitType ->
-                        Tab(
-                            selected = selectedTabIndex.value == index,
+                        Tab(selected = selectedTabIndex.value == index,
                             selectedContentColor = MaterialTheme.colorScheme.primary,
                             unselectedContentColor = MaterialTheme.colorScheme.outline,
                             onClick = {
@@ -115,8 +121,7 @@ class TasksListScreen(
                                     pagerState.animateScrollToPage(habitType.ordinal)
                                 }
                             },
-                            text = { Text(text = habitType.name) }
-                        )
+                            text = { Text(text = habitType.name) })
                     }
                 }
 
@@ -127,12 +132,12 @@ class TasksListScreen(
                         .weight(1f)
                 ) {
                     Column(
-                        verticalArrangement = Arrangement.Center,
+                        verticalArrangement = Arrangement.Top,
                         horizontalAlignment = Alignment.CenterHorizontally,
-                        modifier = Modifier
-                            .fillMaxSize()
+                        modifier = Modifier.fillMaxSize()
                     ) {
                         HabitList(
+                            context = LocalContext.current,
                             habitsList = viewState.habitsByType[
                                 HabitType.getFromOrdinal(selectedTabIndex.value)
                             ]!!,
@@ -140,19 +145,22 @@ class TasksListScreen(
                         )
                     }
                 }
-
-                BottomSheet(
-                    searchText = viewState.searchText,
-                    selectedFilter = selectedFilter,
-                    showBottomSheet = viewState.showBottomSheet,
-                    filteredList = viewState.filteredList
-                )
             }
+
+            BottomSheet(
+                searchText = viewState.searchText,
+                selectedFilter = selectedFilter,
+                showBottomSheet = viewState.showBottomSheet,
+                filteredList = viewState.filteredList
+            )
         }
     }
 
+
+    @RequiresApi(Build.VERSION_CODES.O)
     @Composable
     private fun HabitList(
+        context: Context,
         habitsList: List<HabitUI>,
         onHabitClick: (HabitUI) -> Unit,
     ) {
@@ -162,13 +170,52 @@ class TasksListScreen(
             items(habitsList.size) { index ->
                 HabitCard(
                     habitData = habitsList[index],
-                    onHabitClick = onHabitClick
+                    onHabitClick = onHabitClick,
+                    onHabitDone = {
+                        viewModel.obtainEvent(TasksListEvent.DoneHabit(index, habitsList[index]))
+
+                        showToast(
+                            context = context,
+                            type = habitsList[index].type,
+                            currentRepeatCount = habitsList[index].currentRepeatCount,
+                            repeatCount = if (habitsList[index].repeatCount.isNumeric()) {
+                                habitsList[index].repeatCount.toInt()
+                            } else 0
+                        )
+                    },
+                    onHabitDelete = {
+                        viewModel.obtainEvent(TasksListEvent.DeleteHabit(habitsList[index]))
+                    }
                 )
                 if (index != habitsList.size - 1) Spacer(modifier = Modifier.height(10.dp))
             }
         }
     }
 
+    private fun showToast(
+        context: Context,
+        type: HabitType,
+        currentRepeatCount: Int,
+        repeatCount: Int,
+    ) {
+        if (currentRepeatCount < repeatCount) {
+            val left = repeatCount - currentRepeatCount
+
+            Toast.makeText(
+                context, if (type == HabitType.GOOD) {
+                    "Стоит выполнить еще $left раз"
+                } else "Можете выполнить еще $left раз", Toast.LENGTH_SHORT
+            ).show()
+        } else {
+            Toast.makeText(
+                context, if (type == HabitType.GOOD) {
+                    "You are breathtaking!"
+                } else "Хватит это делать!", Toast.LENGTH_SHORT
+            ).show()
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     private fun BottomSheet(
@@ -180,12 +227,9 @@ class TasksListScreen(
         val sheetState = rememberModalBottomSheetState()
 
         if (showBottomSheet) {
-            ModalBottomSheet(
-                sheetState = sheetState,
-                onDismissRequest = {
-                    viewModel.obtainEvent(TasksListEvent.IsSheetOpen(false))
-                }
-            ) {
+            ModalBottomSheet(sheetState = sheetState, onDismissRequest = {
+                viewModel.obtainEvent(TasksListEvent.IsSheetOpen(false))
+            }) {
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
@@ -203,28 +247,23 @@ class TasksListScreen(
                             onValueChange = {
                                 viewModel.obtainEvent(
                                     TasksListEvent.SearchCard(
-                                        it,
-                                        selectedFilter.value
+                                        it, selectedFilter.value
                                     )
                                 )
-                            }
-                        )
+                            })
 
                         DropdownMenu(
-                            selectedFilter = selectedFilter,
-                            onChangeItem = {
+                            selectedFilter = selectedFilter, onChangeItem = {
                                 viewModel.obtainEvent(
                                     TasksListEvent.SearchCard(
-                                        searchText,
-                                        selectedFilter.value
+                                        searchText, selectedFilter.value
                                     )
                                 )
-                            },
-                            modifier = Modifier.weight(0.32f)
+                            }, modifier = Modifier.weight(0.32f)
                         )
                     }
 
-                    HabitList(
+                    HabitList(context = LocalContext.current,
                         habitsList = filteredList,
                         onHabitClick = {}
                     )
@@ -257,19 +296,14 @@ class TasksListScreen(
                 }
             }
 
-            androidx.compose.material3.DropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { expanded = false }
-            ) {
+            androidx.compose.material3.DropdownMenu(expanded = expanded,
+                onDismissRequest = { expanded = false }) {
                 Filters.entries.forEach { filter ->
-                    DropdownMenuItem(
-                        text = { Text(text = filter.name) },
-                        onClick = {
-                            selectedFilter.value = filter
-                            expanded = false
-                            onChangeItem()
-                        }
-                    )
+                    DropdownMenuItem(text = { Text(text = filter.name) }, onClick = {
+                        selectedFilter.value = filter
+                        expanded = false
+                        onChangeItem()
+                    })
                 }
             }
         }

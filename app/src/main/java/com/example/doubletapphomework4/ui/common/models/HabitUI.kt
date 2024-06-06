@@ -1,5 +1,6 @@
 package com.example.doubletapphomework4.ui.common.models
 
+import com.example.doubletapphomework4.ui.common.enums.HabitPeriod
 import com.example.doubletapphomework4.ui.common.enums.HabitPriority
 import com.example.doubletapphomework4.ui.common.enums.HabitType
 import kotlin.random.Random
@@ -11,5 +12,6 @@ data class HabitUI(
     val priority: HabitPriority = HabitPriority.LOW,
     val type: HabitType = HabitType.GOOD,
     val repeatCount: String = "",
-    val period: String = "",
+    var currentRepeatCount: Int = 0,
+    val period: HabitPeriod = HabitPeriod.WEEK,
 )

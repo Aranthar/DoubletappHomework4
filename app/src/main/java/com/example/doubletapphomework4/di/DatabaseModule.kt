@@ -15,6 +15,8 @@ import dagger.hilt.components.SingletonComponent
 class DatabaseModule {
     @Provides
     fun getHabitRepository(@ApplicationContext appContext: Context): HabitRepository {
-        return Room.databaseBuilder(appContext, AppDatabase::class.java, "Habit").build().habitDao()
+        return Room.databaseBuilder(appContext, AppDatabase::class.java, "Habit")
+            .build()
+            .habitDao()
     }
 }

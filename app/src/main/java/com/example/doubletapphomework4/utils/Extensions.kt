@@ -28,6 +28,10 @@ fun List<HabitUI>.indexOfById(habitData: HabitUI): Int {
     return -1
 }
 
+fun String.isNumeric(): Boolean {
+    return this.matches("-?\\d+".toRegex())
+}
+
 fun View.isKeyboardOpen(): Boolean {
     val rect = Rect()
     getWindowVisibleDisplayFrame(rect);

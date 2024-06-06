@@ -16,4 +16,8 @@ class HabitRepositoryImpl @Inject constructor(private val repository: HabitRepos
     suspend fun updateHabit(habit: HabitUI) {
         repository.updateHabit(habit.toModel())
     }
+
+    suspend fun deleteHabit(habit: HabitUI) {
+        repository.deleteHabit(habit.toModel())
+    }
 }
