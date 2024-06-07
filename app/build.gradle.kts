@@ -65,33 +65,33 @@ dependencies {
     // Room
     implementation("androidx.room:room-runtime:2.6.1")
     implementation("androidx.room:room-ktx:2.6.1")
-    implementation("org.testng:testng:6.9.6")
-    kapt ("androidx.room:room-compiler:2.6.1")
+//    implementation("org.testng:testng:6.9.6")
+    kapt("androidx.room:room-compiler:2.6.1")
 
     // Hilt
     implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
     implementation("com.google.dagger:hilt-android:2.49")
     implementation("androidx.hilt:hilt-work:1.2.0")
-    implementation(libs.androidx.lifecycle.runtime.compose)
     kapt("androidx.hilt:hilt-compiler:1.2.0")
     kapt("com.google.dagger:hilt-android-compiler:2.48")
-
-    implementation("androidx.work:work-runtime-ktx:2.9.0")
 
     // Tests
     implementation("androidx.arch.core:core-testing:2.2.0")
     implementation(libs.junit)
     implementation("org.mockito:mockito-inline:3.9.0")
     implementation("org.mockito:mockito-core:5.12.0")
-//    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.5.1")
     implementation("androidx.compose.ui:ui-test-junit4:1.6.7")
     implementation("androidx.test.espresso:espresso-core:3.5.1")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.5.1")
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
-    androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
+    kaptAndroidTest("com.google.dagger:hilt-android-compiler:2.49")
+    implementation("com.google.dagger:hilt-android-testing:2.49")
+    implementation("androidx.compose.ui:ui-test-junit4-android:1.6.7")
+    debugImplementation("androidx.compose.ui:ui-test-manifest:1.6.7")
 
+    implementation("androidx.work:work-runtime-ktx:2.9.0")
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
